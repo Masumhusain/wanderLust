@@ -1,0 +1,142 @@
+<% layout("layouts/boilerplate") %>
+<script>
+  const mapToken = "<%=process.env.MAP_TOKEN%>";
+  const listing = <%- JSON.stringify(listing) %>;
+
+</script>
+
+
+<style>
+  .object-fit-cover {
+    object-fit: cover;
+    width: 100%;
+  }
+  .starability-result {
+      font-size: 1rem;
+    }
+
+  @media(max-width: 576px) {
+    .object-fit-cover {
+      max-height: 250px;
+    }
+    .starability-result {
+      font-size: 1rem;
+    }
+  #map {
+    height: 200px;
+  }
+
+ 
+  }
+
+  
+
+
+ 
+
+  
+</style>
+<body>
+        <h3><%=listing.title%></h3>
+        <div>
+            <img src="<%=listing.image.url%>" class="img-fluid rounded shadow-sm w-100" alt="image" style="max-height: 400px">
+        </div>
+        
+   
+    <div class="mt-2">
+        <p>Price: &#8377;<%= listing.price ? listing.price.toLocaleString("en-IN") : "N/A" %></p>
+        <p>Owned By: <i><%=listing.owner.username%></i></p>
+        <p>Location: <%=listing.location%></p>
+        <p>Country: <%=listing.country%></p>
+        <p><%=listing.description%></p>
+    </div>
+
+    <!-- <ul>
+        <li>Id: <%=listing._id%></li>
+        <li>Title: <%=listing.title%></li>
+        <li>description: <%=listing.description%></li>
+        <li>image: <%=listing.image%></li>
+        <p>Price: <li>Price: &#8377 <%= listing.price ? listing.price.toLocaleString("en-IN") : "N/A" %></li></p>
+        <li>Location: <%=listing.location %></li>
+        <li>Country: <%=listing.country%></li>
+    </ul> -->
+    <%if(currUser && currUser._id.equals(listing.owner._id)) { %>
+    <div class="two-btn">
+        <form  action="/listings/<%=listing._id%>/edit" method="GET">
+            <button class="btnn edit-btn">edit </button>
+        </form><br>
+        <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE">
+        <button  class="btn btn-dark offset-6">delete</button>
+        </form>
+    </div>
+    <% } %>
+   <hr>
+
+
+   <!-- review listing feedback -->
+    
+    <% if(currUser) {%>
+   <h4 >Leave a review!</h4>
+   <form class="form needs-validation" action="/listings/<%=listing._id%>/reviews" method="POST" novalidate >
+     <div class="review-range">
+
+       <fieldset class="starability-basic">
+  <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+  <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+  <label for="first-rate1" title="Terrible">1 star</label>
+  <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+  <label for="first-rate2" title="Not good">2 stars</label>
+  <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+  <label for="first-rate3" title="Average">3 stars</label>
+  <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+  <label for="first-rate4" title="Very good">4 stars</label>
+  <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+  <label for="first-rate5" title="Amazing">5 stars</label>
+</fieldset>
+     </div>
+
+
+    
+     <div class="review-comment mt-3">
+        <label class="form-label" for="comment">comment</label>
+        <textarea  name="review[comment]" id="comment" placeholder="enter your review" class="form-control" cols="50" rows="5" required></textarea>
+        <p class="invalid-feedback">please add some comment in this field.</p>
+        <button  class="btnn mt-3">Submit</button>
+     </div>
+   </form>
+   <% } %>
+
+ <% if (listing.reviews.length > 0 ) {%>
+  <h3>ALL reviews</h3>
+   <div class="row">
+  <% for(let review of listing.reviews) { %>
+    <div class="col-12 col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5><i>@<%= review.author ? review.author.username : "Unknown User" %></i></h5>
+          <p class="starability-result card-text" data-rating="<%= review.rating  %>">
+  </p>
+          <p class="card-text"><%= review.comment %></p>
+           
+           <form method="POST"  action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" ><button class="btn btn-dark">Delete</button></form>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</div>
+<%}%>
+  
+<div >
+<h3>where you'll be</h3>
+<div id="map" class="rounded shodow-sm"></div>
+
+</div>
+
+      
+
+   
+
+<script src="/js/map.js"></script>
+
+   
+</body>
